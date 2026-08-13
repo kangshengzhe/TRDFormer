@@ -155,8 +155,12 @@ def build(out_dir: str = "manuscript/figures/results",
         # to cross ten dumbbells to reach it.
         gain = 100 * (1 - stats[D.PROPOSED]["ramp"] / stats[REF]["ramp"])
         i_prop = order.index(D.PROPOSED)
+        # One decimal, not zero: the true value is 43.54%, which ".0f" rendered
+        # as "44%" while Section 5.4 quotes "43.5%". Same number, two different
+        # printed values in the same paper -- exactly the kind of mismatch a
+        # reviewer spots.
         axb.text(stats[D.PROPOSED]["ramp"] + 24, i_prop,
-                 f"$-${gain:.0f}% vs\n{D.PRETTY[REF]}",
+                 f"$-${gain:.1f}% vs\n{D.PRETTY[REF]}",
                  ha="left", va="center", fontsize=5.7, color=S.HERO,
                  zorder=20, linespacing=1.15,
                  bbox=dict(boxstyle="round,pad=0.24", facecolor="#FFF1F2",
@@ -184,9 +188,17 @@ def build(out_dir: str = "manuscript/figures/results",
         axc.tick_params(axis="y", length=0)
         # The caveat goes under the axis: every corner inside the panel is
         # covered by a bar, and overlaying it on the bars made it unreadable.
+        # Wrapped short deliberately. This label is centred on panel (c), whose
+        # centre sits at x ~ 0.87 in figure coordinates, so only ~0.12 of width
+        # is left before the canvas edge -- a 42-character line ("hatched:
+        # all-window MAE already >1.8x ours,") measured 0.327 wide and ran
+        # 0.035 OFF the canvas, clipping its last characters. Longest line here
+        # is 23 characters. The "so little left to lose" clause was dropped
+        # rather than shrunk: Section 5.4 already states it in full, so the
+        # label only has to identify what the hatching means.
         axc.set_xlabel("ramp MAE / all-window MAE\n"
-                       "hatched: all-window MAE already $>$1.8$\\times$ ours,"
-                       "\nso little left to lose",
+                       "hatched: all-window MAE\n"
+                       "already $>$1.8$\\times$ ours",
                        labelpad=1.5, fontsize=6.0, linespacing=1.35)
         axc.set_xlim(0, max(stats[m]["ratio"] for m in models) * 1.16)
         axc.grid(True, axis="x", zorder=0)
@@ -234,16 +246,65 @@ def build(out_dir: str = "manuscript/figures/results",
                           framealpha=0.92)
 
         # ============ grouping boxes ============
-        pa, pd_ = axa.get_position(), fig.axes[-1].get_position()
-        S.group_box(fig, 0.020, pa.y0 - 0.058, 0.990, pa.y1 + 0.040,
+        # The bottom edge of each box is measured, not guessed. It used to be
+        # a fixed offset below the axes (pa.y0 - 0.058), which silently broke
+        # when panel (c) acquired a three-line xlabel: the last line ("so
+        # little left to lose") fell OUTSIDE the dashed box. get_tightbbox
+        # includes tick labels, axis labels and titles, so the box now follows
+        # whatever the panels actually occupy.
+        fig.canvas.draw()                      # extents are invalid before this
+        rend = fig.canvas.get_renderer()
+        inv = fig.transFigure.inverted()
+
+        def _extent(axes):
+            """(bottom, top) of a row of axes in figure coordinates."""
+            lo, hi = [], []
+            for ax in axes:
+                bb = ax.get_tightbbox(rend)
+                if bb is None:
+                    continue
+                lo.append(inv.transform((0, bb.y0))[1])
+                hi.append(inv.transform((0, bb.y1))[1])
+            return min(lo), max(hi)
+
+        row1 = [axa, axb, axc]
+        row2 = [ax for ax in fig.axes if ax not in row1]
+        r1_lo, r1_hi = _extent(row1)
+        r2_lo, r2_hi = _extent(row2)
+
+        S.group_box(fig, 0.020, r1_lo - 0.010, 0.990, r1_hi + 0.012,
                     label="1  Ramp windows are where models separate",
                     color="#4A4A4A", lw=0.8, size=6.4,
                     label_side="bottom left")
-        S.group_box(fig, 0.020, pd_.y0 - 0.062, 0.990, pd_.y1 + 0.042,
+        S.group_box(fig, 0.020, r2_lo - 0.010, 0.990, r2_hi + 0.012,
                     label="2  Three ramp events, shaded over the "
                           f"{H}-step horizon",
                     color=S.HERO, lw=0.8, size=6.4,
                     label_side="bottom left")
+        logger.info("group box 1: y %.3f..%.3f | box 2: y %.3f..%.3f",
+                    r1_lo - 0.010, r1_hi + 0.012, r2_lo - 0.010, r2_hi + 0.012)
+
+        # Self-check. Both bugs this figure has had were silent: a label fell
+        # outside the dashed box, and another ran off the canvas entirely. Text
+        # that leaves the canvas is simply clipped by the PNG writer, with no
+        # warning anywhere, so assert it here instead of trusting inspection.
+        fig.canvas.draw()
+        rend = fig.canvas.get_renderer()
+        inv = fig.transFigure.inverted()
+        for ax in fig.axes:
+            for art, what in ((ax.xaxis.label, 'xlabel'),
+                              (ax.yaxis.label, 'ylabel'),
+                              (ax.title, 'title')):
+                if not art.get_text():
+                    continue
+                bb = art.get_window_extent(rend)
+                x0, y0 = inv.transform((bb.x0, bb.y0))
+                x1, y1 = inv.transform((bb.x1, bb.y1))
+                if x0 < -0.002 or x1 > 1.002 or y0 < -0.002 or y1 > 1.002:
+                    logger.warning(
+                        "%s runs off the canvas: x %.3f..%.3f y %.3f..%.3f "
+                        "-- %r", what, x0, x1, y0, y1,
+                        art.get_text().replace('\n', ' | ')[:60])
 
         S.save_figure(fig, Path(out_dir) / out_name)
         plt.close(fig)
