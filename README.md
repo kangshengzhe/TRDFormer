@@ -161,7 +161,11 @@ scripts/          CLI entry points (preprocessing, batch training, benchmarks)
 visualization/    _style.py (one design system) + one script per figure
 tools/            word-count / float-placement auditing
 outputs/          run records, configs, gate weights, manifests
-tests/            unit tests, incl. the DWT partition-isolation checks
+tests/            151 unit tests: cleaning rules, metrics against known
+                  values, model/ablation forward shapes, run-matrix
+                  bookkeeping, and test_dwt_causality.py, which asserts both
+                  the partition-isolation guarantee and the sample-wise
+                  non-causality the paper reports
 ```
 
 `visualization/_style.py` is the single source of truth for figure geometry,

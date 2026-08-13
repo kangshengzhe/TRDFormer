@@ -1,14 +1,37 @@
 """
 DWT (Discrete Wavelet Transform) module for the data pipeline.
 
-Provides causal, leak-free multi-scale frequency decomposition as an alternative
-to VMD. DWT is inherently causal: at each time step, the wavelet coefficients
-are computed using only current and past data points (no future information).
+Multi-scale frequency decomposition used in place of VMD.
 
-Key advantages over VMD for time-series forecasting:
-- Strictly causal: no future information leakage by construction
+WHAT THIS GUARANTEES, AND WHAT IT DOES NOT
+------------------------------------------
+Earlier versions of this docstring claimed the transform was "strictly causal"
+and had "no future information leakage by construction". **That claim was
+wrong and has been retracted**, here and in the paper. Be precise about the
+two different properties:
+
+*Partition isolation -- GUARANTEED.* The decomposition is fitted and applied
+independently within each of train/valid/test, so no coefficient in one
+partition is computed from another partition's samples. This is the property
+that makes the train/test comparison fair, and it is what distinguishes this
+pipeline from fitting VMD over the whole series before splitting.
+
+*Sample-wise causality -- NOT guaranteed.* Within one partition,
+``pywt.wavedec``/``waverec`` reconstruct each sub-band from the entire
+partition at once, with symmetric boundary extension. A sample at t+1
+therefore influences the reconstructed value at t. Measured effect: perturbing
+a single sample one step after a reference index shifts the reconstruction at
+that index by up to 2.3 standardised units (see
+``tests/test_dwt_causality.py``, which asserts this rather than assuming it).
+
+Consequence: results obtained with this module describe an offline, per-window
+decomposition. A strictly online deployment needs a causal FIR approximation,
+and the accuracy reported in the paper should not be assumed to transfer to
+that setting unchanged.
+
+Other properties, which do hold:
 - Computationally efficient: O(N) vs O(N*K*iter) for VMD
-- Stable decomposition: same input always produces the same output
+- Deterministic: same input always produces the same output
 - Well-defined frequency bands: each level captures a specific scale
 
 Channel layout (same as VMD version):
@@ -119,21 +142,25 @@ def dwt_decompose(
     return result
 
 
-def dwt_decompose_causal(
+def dwt_decompose_partition(
     signal: np.ndarray,
     wavelet: str = "db4",
     max_level: int = 4,
 ) -> np.ndarray:
-    """Strictly causal DWT: decompose each partition using only data within
-    that partition. No cross-partition information leakage.
+    """Decompose one partition's signal, using only that partition's samples.
 
-    For wind power forecasting, we apply DWT to each partition (train/valid/test)
-    independently. Within a partition, DWT is applied to the full segment —
-    this is acceptable because:
-    1. During training, the model only sees training data
-    2. During validation/testing, the DWT is applied independently to that
-       partition's data, mimicking real-world deployment where you'd apply
-       DWT to the most recent window of observations
+    Renamed from ``dwt_decompose_causal``: the old name asserted a property the
+    function does not have. What it delivers is *partition isolation* -- no
+    coefficient here is computed from another partition's data -- not
+    *sample-wise causality*. Within the segment, ``wavedec``/``waverec`` see the
+    whole segment, so a sample at t+1 does influence the reconstruction at t.
+
+    The previous docstring justified this as "mimicking real-world deployment
+    where you'd apply DWT to the most recent window of observations". That
+    justification does not hold: deployment would decompose a trailing window
+    ending at t, whereas this decomposes a segment that extends past t. The
+    paper states the limitation explicitly instead; see the module docstring and
+    ``tests/test_dwt_causality.py``.
 
     This differs from VMD which is a global optimization and inherently
     non-causal. DWT's convolution-based nature means each output sample
@@ -249,7 +276,8 @@ def generate_dwt_imfs(
     all_imfs = np.zeros((N, max_level + 1), dtype=np.float32)
 
     for name, (start, end, segment) in signals.items():
-        imfs = dwt_decompose_causal(segment, wavelet=wavelet, max_level=max_level)
+        imfs = dwt_decompose_partition(segment, wavelet=wavelet,
+                                       max_level=max_level)
         all_imfs[start:end] = imfs
         recon_err = np.abs(imfs.sum(axis=1) - segment).max()
         print(f"  DWT {name}: [{start}:{end}] → {imfs.shape}, "
