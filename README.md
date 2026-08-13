@@ -1,5 +1,8 @@
 # TRDFormer
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21911236.svg)](https://doi.org/10.5281/zenodo.21911236)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Code and result records for:
 
 > **TRDFormer: Trend-residual decomposition with wavelet sub-band attention for
@@ -175,6 +178,14 @@ diagram and in every data figure.
   journal = {Electric Power Systems Research},
   note    = {Under review},
   year    = {2026}
+}
+
+@misc{trdformer_code,
+  title     = {{TRDFormer}: code and aggregate result records},
+  author    = {Kang, Shengzhe and Zhu, Xiping and Yang, Tao},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.21911236}
 }
 ```
 
