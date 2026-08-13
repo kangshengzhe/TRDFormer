@@ -237,6 +237,33 @@ def per_section() -> None:
         print(f'{indent}{title[:54]:{54 - len(indent)}s}  {n:6d}')
 
 
+def check_placeholders() -> bool:
+    """拦住带占位符的稿件。
+
+    Data availability 引用的 Zenodo DOI 与 GitHub URL 是投稿前最后一刻才
+    能填的，极易忘记；EPSR 用 Option C，链接不解析等于不合规。所以这里做
+    机械检查，而不是靠记性。
+    """
+    hits = []
+    for name in ('main.tex', 'references.bib', 'cover_letter.md'):
+        p = os.path.join(ROOT, name)
+        if not os.path.exists(p):
+            continue
+        for i, line in enumerate(open(p, encoding='utf-8'), 1):
+            for token in ('USERNAME', 'XXXXXXX', 'zenodo.XXX', '[Date]',
+                          'TODO', 'FIXME'):
+                if token in line:
+                    hits.append((name, i, token, line.strip()[:70]))
+    print()
+    if not hits:
+        print('placeholders: none -- safe to submit')
+        return True
+    print('*** PLACEHOLDERS STILL PRESENT -- DO NOT SUBMIT ***')
+    for name, i, token, txt in hits:
+        print(f'  {name}:{i}  [{token}]  {txt}')
+    return False
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--floats', action='store_true',
@@ -246,6 +273,7 @@ if __name__ == '__main__':
     a = ap.parse_args()
     r = count()
     report(r)
+    check_placeholders()
     if a.sections:
         print()
         per_section()
