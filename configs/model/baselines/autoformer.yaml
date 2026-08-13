@@ -1,0 +1,19 @@
+# Autoformer baseline config
+# Paper: Autoformer: Decomposition Transformers with Auto-Correlation for
+#        Long-Term Series Forecasting (NeurIPS 2021)
+# Role: 序列分解基线，与创新点 A（VMD 分解）形成方法论对比
+#       Autoformer 用自相关机制做隐式分解，而本文用 VMD 做显式分解
+
+model:
+  d_model: 128
+  d_ff: 256
+  e_layers: 2
+  d_layers: 1
+  n_heads: 8
+  moving_avg: 25      # 趋势提取滑动平均窗口大小
+  dropout: 0.1
+  embed: timeF
+  freq: t
+  activation: gelu
+  factor: 3
+  output_attention: false

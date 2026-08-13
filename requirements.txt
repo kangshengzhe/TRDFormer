@@ -1,0 +1,45 @@
+# TRDFormer dependencies.
+#
+# Split into two tiers because the two things a reader might want to do have
+# very different requirements: regenerating every figure and table from the
+# tracked run records needs no GPU and no PyTorch at all, whereas re-running
+# the 1,048 training runs does.
+#
+# Versions are the ones the reported results were produced with. numpy is
+# pinned below 2.0 deliberately: parts of the baseline suite still use
+# np.Inf, which 2.x removed.
+
+# ── Tier 1: reproduce all figures and tables from the tracked records ──────
+#   python -m visualization.build_all_figures
+#   python tools/wordcount_epsr.py --sections --floats
+numpy==1.26.3
+pandas==2.2.3
+scipy==1.13.1
+matplotlib==3.9.2
+PyWavelets==1.6.0          # imported as pywt; the db4 sub-band decomposition
+scikit-learn==1.5.2
+PyYAML==6.0.2
+statsmodels==0.14.2        # autocorrelation figures
+tabulate==0.9.0            # console result tables
+pillow==10.4.0             # imported as PIL; figure preview downscaling
+pymupdf==1.24.9            # imported as fitz; PDF layout self-checks
+tqdm==4.66.5
+
+# ── Tier 2: additionally required to TRAIN ─────────────────────────────────
+torch==2.3.1               # CUDA build recommended; CPU works but is slow
+einops==0.8.0
+beartype==0.18.5
+dill==0.3.8
+optuna==4.0.0              # hyper-parameter search only
+vmdpy==0.2                 # the VMD baseline the paper compares DWT against
+
+# ── Tier 3: optional, only for four of the eleven baselines ────────────────
+# Mamba needs a CUDA toolchain to build. If these are absent the affected
+# baselines are skipped and everything else still runs; they are NOT needed
+# to reproduce any number in the paper from the tracked records.
+# mamba-ssm==2.2.2
+# causal-conv1d==1.4.0
+# reformer-pytorch==1.4.4
+# rotary-embedding-torch==0.6.4
+# gateloop-transformer==0.2.5
+# shap==0.46.0             # exploratory attribution, not used in the paper

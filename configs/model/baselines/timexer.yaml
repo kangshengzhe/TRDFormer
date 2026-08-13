@@ -1,0 +1,20 @@
+# TimeXer baseline config
+# Paper: TimeXer: Empowering Transformers for Time Series Forecasting with
+#        Exogenous Variables (NeurIPS 2024)
+# Role: 外生变量感知基线，与本文创新点 B（双分支分别处理目标/协变量）
+#       和创新点 C（CrossAttention 融合）形成最直接的方法论竞争
+#       TimeXer 也区分内生目标和外生协变量，但用 patch+cross-attn 融合；
+#       本文用 iTransformer + LSTM 双分支 + CrossAttention + KAN，归纳偏置不同
+
+model:
+  d_model: 128
+  d_ff: 256
+  e_layers: 2
+  n_heads: 8
+  dropout: 0.1
+  embed: timeF
+  freq: t
+  activation: gelu
+  factor: 3
+  patch_len: 16
+  use_norm: true

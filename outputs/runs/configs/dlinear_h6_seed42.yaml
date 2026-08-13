@@ -1,0 +1,65 @@
+ablation: {}
+dataset:
+  cleaning:
+    physical_rules: true
+  csv_path: data/wind/sdwpf_turb1_cleaned_final.csv
+  features:
+  - Patv
+  - Wspd
+  - Wdir
+  - Etmp
+  - Itmp
+  partition_path: outputs/manifests/partition_indices_l144_h6.json
+  scaler_path: outputs/manifests/scaler.pkl
+  vmd:
+    K: 5
+    enabled: false
+    imf_path: outputs/manifests/vmd_imfs.npz
+    params_path: outputs/manifests/vmd_params.json
+horizon: 6
+lookback: 144
+model:
+  activation: gelu
+  d_ff: 256
+  d_layers: 1
+  d_model: 128
+  depth_itrans: 4
+  depth_lstm: 3
+  dim_embed: 128
+  dim_lstm: 128
+  dropout: 0.1
+  e_layers: 2
+  embed: timeF
+  factor: 3
+  freq: t
+  heads_itrans: 6
+  moving_avg: 25
+  n_heads: 8
+  num_kernels: 6
+  p_hidden_dims:
+  - 256
+  - 256
+  p_hidden_layers: 2
+  patch_len: 16
+  stride: 8
+  top_k: 5
+  use_norm: true
+model_name: dlinear
+run_id: dlinear_h6_seed42
+runtime:
+  deterministic: true
+  device: cuda
+  execution_location: kaggle_gpu
+  out_dir: /kaggle/working
+seed: 42
+train:
+  batch_size: 128
+  early_stop_delta: 0.0001
+  early_stop_patience: 10
+  epochs: 150
+  learning_rate: 0.0001
+  loss: mae
+  optimizer: adam
+  scheduler: reduce_on_plateau
+  scheduler_factor: 0.5
+  scheduler_patience: 5

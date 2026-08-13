@@ -1,0 +1,20 @@
+# Non-stationary Transformer baseline config
+# Paper: Non-stationary Transformers: Exploring the Stationarity in Time Series
+#        Forecasting (NeurIPS 2022)
+# Role: 非平稳序列基线，风功率序列本质上是非平稳的（受季节/天气变化驱动），
+#       与本文 VMD 预处理处理非平稳性的方式形成对比
+
+model:
+  d_model: 128
+  d_ff: 256
+  e_layers: 2
+  d_layers: 1
+  n_heads: 8
+  dropout: 0.1
+  embed: timeF
+  freq: t
+  activation: gelu
+  factor: 3
+  # Projector MLP for de-stationarization (paper default)
+  p_hidden_dims: [256, 256]
+  p_hidden_layers: 2

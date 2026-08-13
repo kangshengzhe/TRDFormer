@@ -1,0 +1,13 @@
+# Ablation: iTransformer branch removed (Innovation B - target branch)
+# Tests claim: asymmetric dual-branch encoder beats single-branch variants
+ablation:
+  use_itransformer: false
+  use_lstm: true
+  fusion_type: "cross_attention"
+  head_type: "kan"
+
+dataset:
+  vmd:
+    enabled: true
+  cleaning:
+    physical_rules: true

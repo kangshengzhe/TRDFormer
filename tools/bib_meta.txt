@@ -1,0 +1,330 @@
+
+============================================================
+KEY: hybrid_conv_llm2026
+DIR: A-hybrid-convolutional-LLM-paradigm-for-robust-wind-power-fo
+----------------------------------------
+
+
+===== PAGE 1 =====
+ 
+Contents lists available at ScienceDirect
+Applied Energy
+journal homepage: www.elsevier.com/locate/apen
+ 
+A hybrid convolutional-LLM paradigm for robust wind power forecasting in 
+data-scarce regimes
+Wenyi Zhang a iD, Wuyou Xiao a iD, Xudong Li a iD, Zhao Xu a, b, c,∗iD
+a Department of Electrical and Electronic Engineering, The Hong Kong Polytechnic University, Hong Kong Special Administrative Region of China
+b Research Institute of Smart Energy, The Hong Kong Polytechnic University, Hong Kong Special Administrative Region of China
+c Shenzhen Research Institute, The Hong Kong Polytechnic University, Shenzhen, 518129, China
+H I G H L I G H T S
+• Deep-Learning Enhanced LLM framework for robust few-shot wind power forecasting.
+• Convolutional adapter aligns semantic reasoning with high-frequency temporal dynamics.
+• Dual-modality embedding fuses textual prompts and numerical data for better context.
+• Demonstrates viable zero-shot capability for cold-start wind farm deployment.
+A R T I C L E  I N F O
+Keywords:
+Wind power forecasting
+Deep learning
+Large language model
+Data scarcity
+A B S T R A C T
+Accurate wind power forecasting is paramount for power grid stabil
+
+============================================================
+KEY: dbann2025
+DIR: DBANN--Dual-Branch-Attention-Neural-Networks-with-hierarchic
+----------------------------------------
+
+
+===== PAGE 1 =====
+DBANN: Dual-Branch Attention Neural Networks with hierarchical 
+spatiotemporal-perception for multi-node offshore wind power forecasting
+Dan Hu a,d,1, Fengquan He b,d,1, Wei Fan a, Wenlin Feng c,d,*
+a College of Computer Science and Engineering, Chongqing University of Technology, Chongqing, 400054, PR China
+b School of Physics and New Energy, Chongqing University of Technology, Chongqing, 400054, PR China
+c School of Electrical and Electronic Engineering, Chongqing University of Technology, Chongqing, 400054, PR China
+d Chongqing Key Laboratory of Green Energy Materials Technology and Systems, Chongqing, 400054, PR China
+A R T I C L E I N F O
+Keywords:
+Offshore wind power forecasting
+Deep learning
+Spatiotemporal features
+Graph convolutional networks
+Multiresolution convolutional neural networks
+A B S T R A C T
+Precise forecasting of offshore wind power is the basic guarantee for ensuring power grid operation stability and 
+optimizing energy management. Nevertheless, existing approaches struggle to balance multi-scale temporal 
+characteristics, unstructured spatial dependencies, and intertwined spatiotemporal interactions. This study 
+proposed the novel Dual-Br
+
+============================================================
+KEY: dual_path_freq_mamba2025
+DIR: Dual-path-frequency-Mamba-Transformer-model-for-wind-power-f
+----------------------------------------
+
+
+===== PAGE 1 =====
+Dual-path frequency Mamba-Transformer model for wind 
+power forecasting
+Jun-Tao Hong , Shuang Han , Jie Yan , Yong-Qian Liu *
+State Key Laboratory of Alternate Electrical Power System with Renewable Energy Sources, School of New Energy, North China Electric Power University, Beijing, 
+102206, China
+A R T I C L E I N F O
+Keywords:
+Mamba
+Transformer
+Error correction
+Frequency domain analysis
+Wind power forecasting
+A B S T R A C T
+Accurate wind power forecasting is fundamental to the secure and stable operation of renewable energy- 
+dominated power systems. Current wind power forecasting faces two major challenges: 1) accurately charac­
+terizing the rapid fluctuation processes of wind power series, and 2) effectively handling the correlations among 
+variables including wind speed, pressure, temperature, and humidity. To address the limitations of existing wind 
+power prediction methods in extracting the high-frequency features and global information, This study proposes 
+a dual-path frequency Mamba-Transformer (DPFMformer) model with maximal information coefficient-weighted 
+error correction (MEC). First, The DPFMformer model decomposes wind power series through m
+
+============================================================
+KEY: dual_stage_modal2026
+DIR: A-multi-variable-driven-dual-stage-modal-decoupling-framewor
+----------------------------------------
+
+
+===== PAGE 1 =====
+A multi-variable driven dual-stage modal-decoupling framework 
+integrating deterministic–uncertainty modeling for wind power forecasting 
+with feature interpretability analysis
+Wenchao Jia a, Aimin An a,c,*, Bin Gong a, Yaoke Shi b, Zheming Yan a
+a College of Electrical and Information Engineering, Lanzhou University of Technology, Lanzhou, 730050, People's Republic of China
+b School of Computer and Communication, Lanzhou University of Technology, Lanzhou, 730050, People's Republic of China
+c Key Laboratory of Gansu Advanced Control for Industrial Processes, Lanzhou University of Technology, Lanzhou, 730050, People's Republic of China
+A R T I C L E I N F O
+Keywords:
+Wind power
+Modal structure
+Uncertainty interval
+Multivariate coordination
+Parameter optimization
+A B S T R A C T
+Wind power signals exhibit strong non-stationarity, high-frequency noise, and temporal coupling characteristics, 
+which make it difficult for traditional models to effectively capture feature representations, temporal de­
+pendencies, and prediction reliability. To address the challenges of non-stationarity, multi-scale temporal dy­
+namics, and uncertain interval estimation, this study pro
+
+============================================================
+KEY: freq_sparse_downsample2025
+DIR: A-novel-frequency-sparse-downsampling-interaction-transforme
+----------------------------------------
+
+
+===== PAGE 1 =====
+A novel frequency sparse downsampling interaction transformer for wind 
+power forecasting
+Hexian Wang a,b,d
+, Dongjie Guo c, Lingmei Wang a,b,*, Tongming Zhou d
+, Chengzhen Jia a,b,  
+Yushan Liu a,b
+a School of Automation and Software, Shanxi University, Taiyuan, 030006, China
+b Shanxi Province Intelligent Wind Power Technology Innovation Center, Taiyuan, 030006, China
+c State Power Investment Corporation Shanxi New Energy Co., Ltd, Taiyuan, 030006, China
+d Department of Civil, Environmental and Mining Engineering, The University of Western Australia, 35 Stirling Highway, Crawley, WA, 6009, Australia
+A R T I C L E I N F O
+Keywords:
+Wind power forecasting
+Transformers
+Frequency sparse attention
+Downsampling interactive learning
+A B S T R A C T
+Accurate wind power forecasting is essential for the safe operation of power systems and efficient electricity 
+market dispatch. This paper proposes a novel neural network architecture tailored for wind power forecasting, 
+leveraging the unique characteristics of wind power data. With the rapid development of neural networks, 
+Transformer architectures based on multi-head attention have shown excellent performance in wind 
+
+============================================================
+KEY: freq_aware_ultra_short2025
+DIR: Frequency-aware-ultra-short-term-wind-power-forecasting-usin
+----------------------------------------
+
+
+===== PAGE 1 =====
+ 
+Contents lists available at ScienceDirect
+Energy
+journal homepage: www.elsevier.com/locate/energy
+ 
+Frequency-aware ultra-short-term wind power forecasting using 
+CEEMDAN–VMD–SE and Transformer–GRU networks
+Yixin Su a, Zeyu Wang a
+,∗, Zhengcheng Dong a, Xiaojun Hua b, Tao Ye b, Zida Song b, Yun Shao b
+a School of Automation. Wuhan University of Technology, Wuhan, Hubei, 430070, China
+b Hubei Technology Innovation Center for Smart Hydropower, Wuhan, Hubei, 430000, China
+A R T I C L E  I N F O
+Keywords:
+Wind power forecasting
+Frequency characteristics
+Complete ensemble empirical mode 
+decomposition with adaptive noise
+Transformer
+Gated recurrent unit
+ 
+A B S T R A C T
+Reliable short-term wind power forecasting is crucial for the effective management of renewable energy 
+systems, as it enhances power grid scheduling and ensures system stability. Nonetheless, the sporadic and 
+extremely unpredictable characteristics of wind power render the attainment of high forecasting accuracy 
+a considerable challenge. The present study proposes a hybrid forecasting system that combines Complete 
+Ensemble Empirical Mode Decomposition with Adaptive Noise (CEEMDAN), Variational
+
+============================================================
+KEY: cpllm_wpf2025
+DIR: CPLLM-WPF--A-multi-scale-prompting-framework-for-generalizab
+----------------------------------------
+
+
+===== PAGE 1 =====
+Contents lists available at ScienceDirect
+Applied Energy
+journal homepage: www.elsevier.com/locate/apen
+CPLLM-WPF: A multi-scale prompting framework for generalizable wind 
+power forecasting with LLMs
+Yuqi Liu a iD , Weimin Yuan b , Weilong Chen a iD , Wenming Li c , Han Yang d,∗ iD , Yanru Zhang a, d iD
+a College of Computer Science and Engineering, University of Electronic Science and Technology of China, Chengdu 611731, China 
+b Department of Electrical and Computer Engineering at the University of Houston, Houston, TX 77004, USA 
+c State Grid Qinghai Electric Power Company, Xining 810000, China 
+d Shenzhen Institute for Advanced Study, University of Electronic Science and Technology of China, Shenzhen 518000, China
+H I G H L I G H T S
+∙ A novel framework integrates CEEMDAN with LLMs for wind power forecasting.
+∙ Cross-modal reprogramming aligns numerical time series with text-based LLM processing.
+∙ Task-specific prompts embed multi-scale decomposition features and domain knowledge.
+∙ LoRA-based tuning of attention projections yields efficient domain adaptation.
+∙ Achieves superior accuracy and zero-shot generalization across multiple wind farms.
+A R T I C 
+
+============================================================
+KEY: spatially_adaptive_embed2026
+DIR: A-transformer-based-framework-with-spatially-adaptive-embedd
+----------------------------------------
+
+
+===== PAGE 1 =====
+ 
+Contents lists available at ScienceDirect
+Energy
+journal homepage: www.elsevier.com/locate/energy
+ 
+A transformer-based framework with spatially adaptive embedding and 
+meta-feature bank for wind power forecasting
+Yajuan Zhang a,b, Dingwei Guo a,b
+,∗, Yunhe Wang a,b,∗, Chaojie Lian a
+, Ludong Zheng a
+a School of Artificial Intelligence, Hebei University of Technology, Tianjin, 300401, China
+b Hebei Province Key Laboratory of Big Data Calculation, Hebei University of Technology, Tianjin, 300401, China
+A R T I C L E  I N F O
+Keywords:
+Wind power forecasting
+Transformer
+Spatiotemporal modeling
+Spatial adaptive embedding
+Meta-feature bank
+ 
+A B S T R A C T
+Accurate wind power forecasting (WPF) is crucial for scientific scheduling and ensures the safe integration of 
+wind energy into the grid. Current deep learning-based wind power forecasting methods have made significant 
+progress in extracting spatial and temporal features of the data. However, difficulty in representing spatial 
+information of wind turbines and the high volatility of wind power lead to suboptimal performance. In this 
+paper, we design a novel Transformer-based method integrating spatial featur
+
+============================================================
+KEY: dyn_st_graph_kanformer2025
+DIR: Dynamic-Spatio-Temporal-Graph-Enhanced-KANformer-for-high-fi
+----------------------------------------
+
+
+===== PAGE 1 =====
+ 
+Contents lists available at ScienceDirect
+Energy
+journal homepage: www.elsevier.com/locate/energy
+ 
+Dynamic Spatio-Temporal Graph-Enhanced KANformer for high-fidelity 
+ultra-short-term wind power forecasting$
+Zhihan Shi a, Guangming Zhang b,∗, Chao Lu a, Xiaoxiong Zhou a, Xiaodong Lv a
+a School of Mechanical and Power Engineering, Nanjing Tech University, Puzhu South Road 30, Nanjing, 211816, Jiangsu, China
+b College of Electrical Engineering and Control Science, Nanjing Tech University, Puzhu South Road 30, Nanjing, 211816, Jiangsu, China
+A R T I C L E  I N F O
+Keywords:
+Ultra-short-term wind power forecasting
+KANformer
+Kolmogorov–Arnold Networks
+High-frequency time series forecasting
+Deep learning
+Explainable artificial intelligence
+ 
+A B S T R A C T
+Ultra-short-term wind power forecasting (WPF) is crucial for power system stability, yet challenged by wind’s 
+inherent volatility and complex spatio-temporal dependencies. This paper introduces a novel Dynamic Spatio-
+Temporal Graph-Enhanced KANformer (STGAT-KANformer) for high-fidelity WPF at 15 min, 1-hour, and 
+2-hour horizons. The STGAT-KANformer first utilizes a dynamic spatio-temporal Graph Attention Net
+
+============================================================
+KEY: gws_stnet2026
+DIR: A-wind-power-forecasting-method-based-on-GWS-STNet-spatio-te
+----------------------------------------
+
+
+===== PAGE 1 =====
+A wind power forecasting method based on GWS-STNet spatio-temporal 
+meteorological prediction
+Pu Zhang a,1
+, Chuang Li b,1
+, Cheng Qian b
+, Haijing Huang c,d, Yiheng Wang b
+,  
+Rongnian Tang b,*
+a School of Information and Communication Engineering, Hainan University, Haikou, Hainan, 570228, China
+b School of Mechanical and Electrical Engineering, Hainan University, Haikou, Hainan, 570228, China
+c Hainan Key Laboratory of South China Sea Meteorological Disaster Prevention and Mitigation, Haikou, Hainan, 570203, China
+d Hainan Meteorological Service Center, Haikou, Hainan, 570311, China
+A R T I C L E I N F O
+Keywords:
+Wind power forecasting
+Spatio-temporal
+GWS-STNet
+Adaptive Gaussian weighting
+Swin Transformer
+A B S T R A C T
+Accurate wind power forecasting is pivotal for boosting wind-energy utilization and accelerating the transition to 
+clean energy. Yet current models remain limited in representing local wind-field disturbances and in multi-scale 
+spatio-temporal modeling. This work proposes a two-stage hybrid framework for offshore wind power fore­
+casting comprising the meteorological spatiotemporal predictor Gaussian-Weighted Swin Spatio-Temporal 
+Network
+
+============================================================
+KEY: wd_sgformer2025
+DIR: WD-SGformer--high-precision-wind-power-forecasting-via-dual-
+----------------------------------------
+
+
+===== PAGE 1 =====
+WD-SGformer: high-precision wind power forecasting via dual-attention 
+dynamic spatio-temporal learning
+Yakai Yang c, Shuanglong Fan a, Zhenqing Liu a,b,c,d,*
+, Zhongze Yu a
+a School of Civil and Hydraulic Engineering, Huazhong University of Science and Technology, Wuhan, Hubei, China
+b National Center of Technology Lnnovation for Digital Construction, Huazhong University of Science and Technology, Wuhan, Hubei, China
+c China-EU Institute for Clean and Renewable Energy, Huazhong University of Science and Technology, Wuhan, Hubei, China
+d CGN New Energy Holdings Co, Ltd. Bejing, China
+A R T I C L E I N F O
+Keywords:
+Wind power forecasting
+Deep learning
+Attention mechanism
+Transformer
+Spatio-temporal modeling
+A B S T R A C T
+Accurate wind power forecasting is essential for grid stability and successful renewable energy integration, yet 
+conventional models exhibit significant limitations in complex terrains due to decoupled spatio-temporal pro­
+cessing, inflexible modeling of dynamic meteorological influences and their associated temporal delays, and 
+static representations of spatial interactions. This paper introduces the Weather-Differentiated Spectro- 
+Geogra

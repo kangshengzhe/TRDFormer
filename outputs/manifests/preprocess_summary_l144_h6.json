@@ -1,0 +1,59 @@
+{
+  "csv_path": "data/wind/sdwpf_turb1_cleaned_final.csv",
+  "manifest_dir": "outputs\\manifests",
+  "lookback": 144,
+  "horizon": 6,
+  "n_total_rows": 35279,
+  "n_features_out": 10,
+  "vmd_enabled": true,
+  "vmd_k": 5,
+  "cleaning_enabled": true,
+  "feature_cols": [
+    "Patv",
+    "Wspd",
+    "Wdir",
+    "Etmp",
+    "Itmp"
+  ],
+  "channel_layout": [
+    "Patv",
+    "IMF_1",
+    "IMF_2",
+    "IMF_3",
+    "IMF_4",
+    "IMF_5",
+    "Wspd",
+    "Wdir",
+    "Etmp",
+    "Itmp"
+  ],
+  "partition": {
+    "train": {
+      "start": 0,
+      "end": 28223,
+      "n_rows": 28223
+    },
+    "valid": {
+      "start": 28223,
+      "end": 31752,
+      "n_rows": 3529
+    },
+    "test": {
+      "start": 31752,
+      "end": 35279,
+      "n_rows": 3527
+    }
+  },
+  "train_shape": [
+    28223,
+    10
+  ],
+  "valid_shape": [
+    3529,
+    10
+  ],
+  "test_shape": [
+    3527,
+    10
+  ]
+}

@@ -1,0 +1,13 @@
+# Ablation: KAN prediction head replaced with linear head (Innovation C)
+# Tests claim: CrossAttention fusion + KAN head beats simpler fusion/head choices
+ablation:
+  use_itransformer: true
+  use_lstm: true
+  fusion_type: "cross_attention"
+  head_type: "linear"
+
+dataset:
+  vmd:
+    enabled: true
+  cleaning:
+    physical_rules: true

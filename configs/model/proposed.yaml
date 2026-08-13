@@ -1,0 +1,27 @@
+# Proposed model configuration
+# iTransformer + LSTM + CrossAttention + KAN with VMD preprocessing
+model:
+  name: "proposed"
+  dim_embed: 128
+  depth_itrans: 4
+  heads_itrans: 6
+  dim_lstm: 128
+  depth_lstm: 3
+
+ablation:
+  use_itransformer: true
+  use_lstm: true
+  fusion_type: "cross_attention"
+  head_type: "kan"
+
+train:
+  batch_size: 128
+  learning_rate: 1.0e-4
+  optimizer: "adam"
+  epochs: 150
+  early_stop_patience: 10
+  early_stop_delta: 1.0e-4
+  scheduler: "reduce_on_plateau"
+  scheduler_factor: 0.5
+  scheduler_patience: 5
+  loss: "mae"

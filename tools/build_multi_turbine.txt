@@ -1,0 +1,21 @@
+
+=== generating unified cleaned data (10 turbines) -> multiturb/ ===
+turb1   rows=35279  patv_mean=466.7  patv_std=525.2  (clip_neg=7939 below_cutin=3039)
+turb2   rows=35279  patv_mean=401.6  patv_std=466.9  (clip_neg=10099 below_cutin=2740)
+turb13  rows=35279  patv_mean=375.7  patv_std=453.6  (clip_neg=9179 below_cutin=3203)
+turb55  rows=35279  patv_mean=361.7  patv_std=432.2  (clip_neg=9921 below_cutin=3599)
+turb70  rows=35279  patv_mean=409.0  patv_std=452.7  (clip_neg=9167 below_cutin=3386)
+turb83  rows=35279  patv_mean=362.8  patv_std=459.0  (clip_neg=10084 below_cutin=3782)
+turb86  rows=35279  patv_mean=323.2  patv_std=395.5  (clip_neg=9599 below_cutin=4005)
+turb88  rows=35279  patv_mean=338.8  patv_std=404.8  (clip_neg=9905 below_cutin=3319)
+turb94  rows=35279  patv_mean=346.2  patv_std=372.3  (clip_neg=10156 below_cutin=3559)
+turb99  rows=35279  patv_mean=248.4  patv_std=351.8  (clip_neg=9045 below_cutin=1731)
+
+row counts across turbines: [35279] (all equal: True)
+
+=== unified turb1 vs official (key-aligned, merged rows=35279) ===
+  Patv  rows_diff>0.01= 4199  max=758.136  mean=9.13349
+  Wspd  rows_diff>0.01= 3035  max=5.182  mean=0.06513
+  Wdir  rows_diff>0.01= 3342  max=359.543  mean=15.14594
+  Etmp  rows_diff>0.01= 3023  max=256.783  mean=0.65869
+  Itmp  rows_diff>0.01= 3100  max=279.280  mean=0.74704

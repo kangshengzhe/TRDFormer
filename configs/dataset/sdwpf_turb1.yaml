@@ -1,0 +1,32 @@
+# Dataset configuration for SDWPF Turb1
+# Single turbine from the Spatial Dynamic Wind Power Forecasting dataset
+# 245 days at 10-minute resolution
+
+dataset:
+  name: "sdwpf_turb1"
+  csv_path: "data/wind/sdwpf_turb1_cleaned_final.csv"
+  features: ["Patv", "Wspd", "Wdir", "Etmp", "Itmp"]
+  target_col: 0                    # Patv (Active Power, kW)
+  n_features: 5
+  freq_seconds: 600                # 10-minute intervals
+  train_ratio: 0.8
+  test_ratio: 0.1
+  lookback: 144                    # 24 hours at 10-min intervals
+  manifest_dir: "outputs/manifests"
+  scaler_path: "outputs/manifests/scaler.pkl"
+
+  vmd:
+    enabled: true
+    K: 5
+    alpha: 2000.0
+    tau: 0.0
+    DC: 0
+    init: 1
+    tol: 1.0e-7
+    params_path: "outputs/manifests/vmd_params.json"
+    imf_path: "outputs/manifests/vmd_imfs.npz"
+
+  cleaning:
+    physical_rules: true
+    cutin_speed_mps: 3.0
+    wspd_max_mps: 25.0

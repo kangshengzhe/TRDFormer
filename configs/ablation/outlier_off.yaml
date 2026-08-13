@@ -1,0 +1,13 @@
+# Ablation: Physical-rule outlier cleaning disabled (Innovation A)
+# Tests claim: VMD + outlier rules reduce MAE relative to proposed without them
+ablation:
+  use_itransformer: true
+  use_lstm: true
+  fusion_type: "cross_attention"
+  head_type: "kan"
+
+dataset:
+  vmd:
+    enabled: true
+  cleaning:
+    physical_rules: false

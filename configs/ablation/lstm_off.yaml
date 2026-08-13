@@ -1,0 +1,13 @@
+# Ablation: LSTM branch removed (Innovation B - covariate branch)
+# Tests claim: asymmetric dual-branch encoder beats single-branch variants
+ablation:
+  use_itransformer: true
+  use_lstm: false
+  fusion_type: "cross_attention"
+  head_type: "kan"
+
+dataset:
+  vmd:
+    enabled: true
+  cleaning:
+    physical_rules: true

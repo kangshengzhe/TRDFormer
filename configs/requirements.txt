@@ -1,0 +1,25 @@
+# Core dependencies (PyTorch由Kaggle预装，无需指定)
+einops==0.8.0
+fightingcv-attention==1.0.0
+dill==0.3.8
+
+# Data processing - 锁定numpy 1.x，避免np.Inf问题
+numpy==1.26.3
+pandas==2.2.3
+scikit-learn==1.5.2
+scipy==1.13.1
+
+# Visualization
+matplotlib==3.9.2
+
+# Hyperparameter tuning
+optuna==4.0.0
+optuna-dashboard==0.16.2
+
+# Explainability
+shap==0.46.0
+
+# Utilities
+tqdm==4.66.5
+PyYAML==6.0.2
+colorama==0.4.6

@@ -1,0 +1,8 @@
+# Runtime configuration for local CPU environment
+runtime:
+  execution_location: "local_cpu"
+  device: "cpu"
+  deterministic: true
+  tsl_root: "C:/Users/kangs/Desktop/windpower_model/Time-Series-Library"
+  out_dir: "outputs"
+  gpu_time_budget_hours: 0         # No GPU budget on local CPU

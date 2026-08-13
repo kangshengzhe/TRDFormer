@@ -1,0 +1,17 @@
+{
+  "lookback": 144,
+  "horizon": 24,
+  "n_total_rows": 35279,
+  "train": {
+    "start": 0,
+    "end": 28223
+  },
+  "valid": {
+    "start": 28223,
+    "end": 31752
+  },
+  "test": {
+    "start": 31752,
+    "end": 35279
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "K": 5,
+  "alpha": 2000.0,
+  "tau": 0.0,
+  "DC": 0,
+  "init": 1,
+  "tol": 1e-07,
+  "max_iter": 500,
+  "library": "vmdpy==0.2",
+  "fit_seed": 42,
+  "fit_n_samples": 28223,
+  "imf_shape": [
+    35279,
+    5
+  ]
+}

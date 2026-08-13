@@ -1,0 +1,14 @@
+# Ablation: VMD decomposition disabled (Innovation A)
+# Tests claim: VMD + outlier rules reduce MAE relative to proposed without them
+# Model receives raw Patv instead of K IMF components
+ablation:
+  use_itransformer: true
+  use_lstm: true
+  fusion_type: "cross_attention"
+  head_type: "kan"
+
+dataset:
+  vmd:
+    enabled: false
+  cleaning:
+    physical_rules: true

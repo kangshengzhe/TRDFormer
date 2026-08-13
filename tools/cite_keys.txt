@@ -1,0 +1,15 @@
+﻿% NOTE: citation keys below (e.g. \cite{gws_stnet2026}) are placeholders
+(Section~\ref{sec:innovation-c}). KANformer \cite{dyn_st_graph_kanformer2025}
+\cite{freq_aware_ultra_short2025}. The common practice in this literature
+\cite{gws_stnet2026} and WD-SGformer's learnable gated fusion for
+\cite{hybrid_conv_llm2026}, dual-branch attention networks with
+\cite{timexer2024} explicitly separates endogenous and exogenous
+for wind farm clusters \cite{spatially_adaptive_embed2026} and dynamic
+forecasting \cite{dyn_st_graph_kanformer2025}, both of which reinforce
+frameworks \cite{dual_stage_modal2026}, frequency-sparse downsampling
+hierarchical spatio-temporal structure (DBANN) \cite{dbann2025}, and
+high-precision wind power forecasting \cite{wd_sgformer2025} both
+interaction transformers \cite{freq_sparse_downsample2025}, and
+iTransformer \cite{itransformer2024} reformulated the Transformer's
+philosophy of CPLLM-WPF \cite{cpllm_wpf2025} rather than the
+term forecasting \cite{dual_path_freq_mamba2025} illustrate a broader

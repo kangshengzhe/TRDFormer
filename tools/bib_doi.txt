@@ -1,0 +1,66 @@
+
+[hybrid_conv_llm2026]
+  DOI  : ['https://doi.org/10.1016/j.apenergy.2026.127914']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['518129', '127914']
+
+[dbann2025]
+  DOI  : ['https://doi.org/10.1016/j.energy.2025.137521']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['400054', '400054']
+
+[dual_path_freq_mamba2025]
+  DOI  : ['https://doi.org/10.1016/j.energy.2025.137225']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['102206', '102206']
+
+[dual_stage_modal2026]
+  DOI  : ['https://doi.org/10.1016/j.energy.2025.139884']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['730050', '730050']
+
+[freq_sparse_downsample2025]
+  DOI  : ['https://doi.org/10.1016/j.energy.2025.136199']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['030006', '030006']
+
+[freq_aware_ultra_short2025]
+  DOI  : ['https://doi.org/10.1016/j.energy.2025.138715']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['430070', '430000']
+
+[cpllm_wpf2025]
+  DOI  : ['https://doi.org/10.1016/j.apenergy.2025.126912']
+  vol  : NOT FOUND
+  pages: ['1', '50', '2']
+  art# : ['611731', '810000']
+
+[spatially_adaptive_embed2026]
+  DOI  : ['https://doi.org/10.1016/j.energy.2026.141141']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['300401', '300401']
+
+[dyn_st_graph_kanformer2025]
+  DOI  : ['https://doi.org/10.1016/j.energy.2025.138590']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['211816', '211816']
+
+[gws_stnet2026]
+  DOI  : ['https://doi.org/10.1016/j.energy.2026.140714']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['570228', '570228']
+
+[wd_sgformer2025]
+  DOI  : ['https://doi.org/10.1016/j.energy.2025.138538']
+  vol  : NOT FOUND
+  pages: ['1', '2', '3']
+  art# : ['138538', '138538']

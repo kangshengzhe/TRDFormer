@@ -1,0 +1,29 @@
+# Baseline: FEDformer (frequency-domain decomposition baseline)
+# Source: Time-Series-Library/models/FEDformer.py
+# Pairs as contrast with VMD preprocessing in Innovation A
+model:
+  name: "fedformer"
+  source: "tsl"
+  d_model: 128
+  d_ff: 256
+  e_layers: 2
+  d_layers: 1
+  n_heads: 8
+  factor: 3
+  moving_avg: 25
+  dropout: 0.1
+  embed: "timeF"
+  freq: "t"
+  activation: "gelu"
+
+train:
+  batch_size: 128
+  learning_rate: 1.0e-4
+  optimizer: "adam"
+  epochs: 150
+  early_stop_patience: 10
+  early_stop_delta: 1.0e-4
+  scheduler: "reduce_on_plateau"
+  scheduler_factor: 0.5
+  scheduler_patience: 5
+  loss: "mae"

@@ -1,0 +1,112 @@
+# ---------------------------------------------------------------------------
+# .gitignore for the public TRDFormer repository
+#
+# Two goals, which pull in opposite directions:
+#   1. the clone must stay small enough to be useful (the working tree is
+#      ~590 MB, of which 511 MB is per-sample prediction arrays);
+#   2. it must still REPRODUCE every table and every metric figure in the
+#      paper, which means the aggregate run records have to be tracked.
+#
+# The previous version of this file failed (2) by ignoring outputs/runs/ and
+# outputs/manifests/ wholesale and by ignoring *.pkl globally -- that dropped
+# run_records.jsonl and scaler.pkl, i.e. exactly the inputs the figure
+# scripts read. The rules below therefore exclude by FILE PATTERN, not by
+# directory, and add explicit negations where a broad rule would otherwise
+# swallow something needed.
+# ---------------------------------------------------------------------------
+
+# ── Third-party data ───────────────────────────────────────────────────────
+# SDWPF is a public dataset but redistribution terms are the publisher's, not
+# ours. scripts/ contains the download + cleaning path instead; see README.
+data/
+
+# ── Manuscript sources ─────────────────────────────────────────────────────
+# The article is under review; the repository is a code and results deposit.
+manuscript/
+
+# ── Bulk experiment artefacts ──────────────────────────────────────────────
+# 917 per-sample prediction arrays, ~511 MB. Regenerable by re-running the
+# experiments; also available on request. Everything else under outputs/
+# (run_records.jsonl, *_losses.npz, configs, manifests) is small and tracked.
+outputs/**/*_preds.npz
+outputs/manifests/vmd_imfs_causal_backup.npz
+model_save/
+
+# ── Checkpoints and binaries ───────────────────────────────────────────────
+*.pt
+*.pth
+*.pkl
+!outputs/manifests/scaler.pkl
+tools/tectonic/
+
+# ── Internal working notes (Chinese drafts, superseded claims) ─────────────
+# Kept locally, not published: these predate the final manuscript and still
+# assert things it retracted (e.g. a "strictly causal" DWT), so shipping them
+# would contradict the paper.
+论文*.md
+论文*.pdf
+LaTeX排版避坑文档.md
+投稿材料清单.md
+docs/
+_cleanup_archive/
+legacy/
+
+# ── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ── Virtual environments ───────────────────────────────────────────────────
+venv/
+env/
+ENV/
+.venv/
+
+# ── Optuna / databases ─────────────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+
+# ── Logs ───────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── IDE / OS ───────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/
+
+# ── Scratch files ──────────────────────────────────────────────────────────
+# Ad-hoc debug scripts accumulated at the repo root during troubleshooting
+# (_debug_full.*, _bisect*.py, _mini.*, pandoc_log*.txt were all found there
+# in the 2026-08 cleanup), so anything root-level starting with an underscore
+# is ignored.
+*.tmp
+*.bak
+/_*
+pandoc_log*.txt
+/*.aux
+/*.bbl
+/*.blg
+/*.out
+/*.toc
+/*.fls
+/*.fdb_latexmk

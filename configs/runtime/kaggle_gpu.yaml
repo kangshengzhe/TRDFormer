@@ -1,0 +1,8 @@
+# Runtime configuration for Kaggle GPU environment
+runtime:
+  execution_location: "kaggle_gpu"
+  device: "auto"                   # Will select cuda if available
+  deterministic: true
+  tsl_root: "/kaggle/input/time-series-library"
+  out_dir: "/kaggle/working"
+  gpu_time_budget_hours: 30        # Weekly Kaggle free GPU quota

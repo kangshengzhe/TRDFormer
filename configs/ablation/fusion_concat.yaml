@@ -1,0 +1,13 @@
+# Ablation: CrossAttention fusion replaced with concatenation (Innovation C)
+# Tests claim: CrossAttention fusion + KAN head beats simpler fusion/head choices
+ablation:
+  use_itransformer: true
+  use_lstm: true
+  fusion_type: "concat"
+  head_type: "kan"
+
+dataset:
+  vmd:
+    enabled: true
+  cleaning:
+    physical_rules: true

@@ -1,0 +1,76 @@
+# Full experiment matrix configuration
+# Defines the Cartesian product of (model, horizon, seed) for all runs
+# Total: 340 GPU runs + optional Optuna + optional SHAP
+
+experiment:
+  name: "full_matrix"
+  description: "Complete experiment matrix for SCI paper"
+
+  # Forecast horizons (steps ahead, 10-min intervals)
+  horizons: [1, 6, 12, 24]
+
+  # Random seeds for repeated trials (>=5 per Req 6.4)
+  seeds: [42, 43, 44, 45, 46]
+
+  # Model groups
+  models:
+    proposed:
+      - "proposed"
+
+    baselines:
+      - "lstm"
+      - "transformer"
+      - "informer"
+      - "fedformer"
+      - "dlinear"
+      - "patchtst"
+      - "itransformer"
+      - "timesnet"
+
+    ablations:
+      - "ablation:itrans_off"
+      - "ablation:lstm_off"
+      - "ablation:fusion_concat"
+      - "ablation:fusion_sum"
+      - "ablation:head_linear"
+      - "ablation:head_mlp"
+      - "ablation:vmd_off"
+      - "ablation:outlier_off"
+
+  # Run cardinality
+  # Proposed:  1 x 4 x 5 =  20 runs
+  # Baselines: 8 x 4 x 5 = 160 runs
+  # Ablations: 8 x 4 x 5 = 160 runs
+  # Total:                   340 GPU runs
+
+  # Config references to merge for each run
+  base_configs:
+    dataset: "configs/dataset/sdwpf_turb1.yaml"
+    model_proposed: "configs/model/proposed.yaml"
+    model_baselines_dir: "configs/model/baselines/"
+    ablations_dir: "configs/ablation/"
+
+  # Priority-based shedding under budget pressure (Req 12.5, 12.6)
+  # Order: SHAP -> Optuna -> optional charts -> reduce seeds
+  priority:
+    required:
+      - "proposed"
+      - "baselines"
+      - "ablations"
+      - "significance_tests"
+      - "statistical_summary"
+      - "visualization_core"
+    optional:
+      - "shap"
+      - "optuna"
+      - "visualization_extra"
+
+  # Minimum seeds before shedding stops (Req 12.6)
+  min_seeds: 3
+
+  # Output paths
+  output:
+    configs_dir: "outputs/runs/configs"
+    records_file: "outputs/runs/run_records.jsonl"
+    budget_file: "outputs/runs/budget.json"
+    deferred_file: "outputs/runs/deferred.jsonl"
