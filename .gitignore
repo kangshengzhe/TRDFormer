@@ -23,6 +23,7 @@ data/
 # ── Manuscript sources ─────────────────────────────────────────────────────
 # The article is under review; the repository is a code and results deposit.
 manuscript/
+manuscript_backup_*/
 
 # ── Bulk experiment artefacts ──────────────────────────────────────────────
 # 917 per-sample prediction arrays, ~511 MB. Regenerable by re-running the

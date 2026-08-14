@@ -46,6 +46,32 @@ no-sub-band baseline to within 0.01 kW. That is the cleanest single number in
 the repository: it isolates alignment from architecture and shows the entire
 ablation effect is alignment.
 
+### It is not a quirk of one dataset
+
+The two model-free diagnostics replicate on an independent single-turbine SCADA
+record — different country, provider and year (Turkey, 2018), sharing only
+timestamp, power and wind speed with SDWPF:
+
+| Diagnostic (second dataset) | Offline | Strictly causal |
+|---|---|---|
+| Ridge probe, gain over persistence at lead 1 | −49.07 kW | −2.73 kW (**18.0×** gap) |
+| Linear ceiling vs. raw lookback only (343.12 kW) | **−35.9 %** | **+1.0 %** |
+
+`tools/cross_dataset_leakage_check.py` runs this end to end. It is
+**segment-aware on purpose**: that record has 32 sampling gaps, three of them
+spanning up to 4.3 days, and `pywt.wavedec` has no notion of a timestamp. So
+the series is split at every discontinuity and each contiguous segment of
+≥ 512 rows is decomposed independently (22 segments, 21,435 rows). Dropping the
+missing rows and concatenating instead would let the filter bank manufacture a
+step artefact at every splice, which the probe would then read as
+"information" — a self-inflicted result. Interpolating is no better: a straight
+line through a third of a week is invented data entering both the decomposition
+and the evaluation.
+
+Retraining results in this repository remain SDWPF-only. The second record's
+segments (median 896 rows) are too short to train a 144-step-lookback model
+without fabricating data across those gaps.
+
 ## The model used as the case study
 
 The forecaster splits the task in two. A linear branch takes the strongly
@@ -77,6 +103,9 @@ specifically so that the measurement is a property of common practice.
   architecture is not what the ablation is measuring.
 - `tools/probe_perturbation.py` — inject a known perturbation after the
   forecast origin and confirm the decomposition should not, but does, move.
+- `tools/cross_dataset_leakage_check.py` — both probes on a second,
+  independent SCADA record, decomposing strictly inside contiguous segments
+  so no filter crosses a sampling gap.
 - `tests/test_dwt_causality.py` — asserts both the partition-isolation
   guarantee and the sample-wise non-causality within a partition.
 
@@ -94,7 +123,7 @@ Not tracked, and why:
 
 | Excluded | Size | Why / how to get it |
 |---|---|---|
-| `data/` | 17 MB | SDWPF is public but redistribution terms are the publisher's. See below. |
+| `data/` | 21 MB | SDWPF and the second SCADA record are both public, but redistribution terms are their publishers'. See [Data](#data). |
 | `outputs/**/*_preds.npz` | 511 MB | Per-sample prediction arrays. Regenerable by re-running, or available on request. |
 | `manuscript/` | — | The article is under review; this is a code and results deposit. |
 
@@ -135,6 +164,18 @@ python -m scripts.gen_dwt_imfs_atrous             # causal alternative
 Turbine 1 yields 35,279 valid samples. Pass `--help` to each for the full flag
 list.
 
+### Second dataset (cross-dataset check only)
+
+A single-turbine SCADA record from Turkey, 2018, 10-minute resolution,
+originally distributed via Kaggle as "Wind Turbine Scada Dataset" and mirrored
+in `dominodatalab/reference-project-wind-turbine-scada`. Place `T1.csv` under
+`data/wind_turkey/`; no preprocessing CLI is needed, the check script does its
+own cleaning and segmentation. Columns used: `Date/Time`,
+`LV ActivePower (kW)`, `Wind Speed (m/s)`, `Wind Direction (°)`.
+`Theoretical_Power_Curve` is deliberately dropped — it is a manufacturer curve
+evaluated on the same wind-speed column, not an independent sensor, so keeping
+it would let the probe read wind speed by proxy.
+
 ## Reproduce
 
 ### The leakage diagnostics — no GPU, no training
@@ -143,6 +184,7 @@ list.
 python tools/probe_subband_leakage.py
 python tools/probe_linear_ceiling.py
 python tools/probe_perturbation.py
+python tools/cross_dataset_leakage_check.py   # second dataset; needs data/wind_turkey/T1.csv
 ```
 
 ### Figures and tables — no GPU, no training
@@ -184,8 +226,8 @@ models/           the case-study model (TRDFormer) and the 11 baselines
 experiments/      library: run matrix, runner, metrics, significance tests
 scripts/          CLI entry points: preprocessing, batch training, benchmarks,
                   causal / delayed / trailing-window sub-band generators
-tools/            leakage probes, word-count / float-placement auditing,
-                  manuscript-number verification
+tools/            leakage probes (incl. the cross-dataset check), word-count /
+                  float-placement auditing, manuscript-number verification
 visualization/    _style.py (one design system) + one script per figure
 outputs/          run records, configs, gate weights, manifests
 tests/            unit tests: cleaning rules, metrics against known values,
