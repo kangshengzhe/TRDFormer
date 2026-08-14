@@ -55,8 +55,11 @@ DIAGNOSTIC = [
     ("ridge ceiling with bands",      "58.06"),
     ("ridge ceiling without bands",   "106.09"),
     ("ridge encoder worth",           "24"),
+    # 2026-08: even-parity 值曾误写为 0.71。实测 0.7046，两位小数应为 0.70。
+    # 本列表只做"论文里是否出现该字符串"的存在性检查，所以写错了也会通过 ——
+    # 这类舍入错误要靠 tools/probe_perturbation.py 的实测输出来核对。
     ("perturbation D1 odd",           "2.29"),
-    ("perturbation D1 even",          "0.71"),
+    ("perturbation D1 even",          "0.70"),
     ("additivity of atrous",          r"9\\times10\^\{-16\}"),
     ("additivity under perturbation", r"8\\times10\^\{-16\}"),
     ("survey total",                  "50"),

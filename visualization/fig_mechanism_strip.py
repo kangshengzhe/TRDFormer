@@ -13,9 +13,9 @@ This renders the strip that sits directly beneath the diagram in
 ``main.tex``: one panel per branch entry point, framed in the innovation
 colour of the block it feeds.
 
-  (b) what the trend branch computes   - y, its moving average, the residual
-  (c) what the endogenous branch gets  - five db4 sub-bands of y
-  (d) what the exogenous branch gets   - four standardised covariates
+  (a) what the trend branch computes   - y, its moving average, the residual
+  (b) what the endogenous branch gets  - five db4 sub-bands of y
+  (c) what the exogenous branch gets   - four standardised covariates
 
 All three panels use the same grammar - traces offset vertically on a common
 time axis - so the strip reads as one object. An earlier version gave each
@@ -36,14 +36,14 @@ implementation the two act in *parallel* on the same ``y``:
                                through UNCHANGED, so they remain sub-bands
                                of the un-de-trended y.
 
-So the reconstruction identity is ``y = A4 + sum(D1..D4)``, and panel (c)
+So the reconstruction identity is ``y = A4 + sum(D1..D4)``, and panel (b)
 must decompose ``patv``. An earlier version of this script decomposed
 ``resid`` instead, which drew a tensor that never enters the model -- the
-opposite of what this figure exists to show. Panel (b) still shows the
+opposite of what this figure exists to show. Panel (a) still shows the
 trend/residual split, whose scales differ by roughly 4.5x (std 0.78 vs
 0.17); that ratio is the point of doing the split at all.
 
-Panel (c) therefore does overlap Fig. 1(e) in content (both decompose y),
+Panel (b) therefore does overlap Fig. 1(e) in content (both decompose y),
 but not in purpose: Fig. 1 argues decomposition is *needed*, this panel
 shows the resulting five channels *as the variate tokens the encoder
 receives*.
@@ -176,7 +176,14 @@ def build(out_dir: str = "manuscript/figures/method",
             left=0.028, right=0.990, top=0.800, bottom=0.150, wspace=0.13,
         )
 
-        # ---------- (b) trend / residual split ----------
+        # ---------- (a) trend / residual split ----------
+        # Panels are lettered (a),(b),(c) -- NOT (b),(c),(d) as they were
+        # until 2026-08. The original numbering assumed this strip shared one
+        # float with the TikZ architecture drawing, which was panel (a). That
+        # float was split in two (the diagram is 5.11in tall and the strip
+        # 1.66in, against a 7.59in \textheight), so the strip is now its own
+        # figure and has to letter its panels from (a) like any other. Left
+        # as-is, the figure opened at (b) with no (a) anywhere in it.
         axb = fig.add_subplot(gs[0, 0])
         _stack(axb, t, [
             ("residual", resid[w0:w1], S.INNOV["C_endo"], 0.6),
@@ -184,23 +191,23 @@ def build(out_dir: str = "manuscript/figures/method",
             ("$y$", patv[w0:w1], "#555555", 0.6),
         ][::-1], gap=1.25)
         _tie_to_block(axb, S.INNOV["A"], "A  Trend $-$ residual split")
-        S.panel_tag(axb, "b", size=6.5, loc="lower right")
+        S.panel_tag(axb, "a", size=6.5, loc="lower right")
 
-        # ---------- (c) sub-bands of y ----------
+        # ---------- (b) sub-bands of y ----------
         axc = fig.add_subplot(gs[0, 1])
         _stack(axc, t, [(f"${nm[0]}_{{{nm[1]}}}$", bands[nm][w0:w1],
                          BAND_COLOR[nm], 0.55) for nm in BANDS][::-1],
                gap=1.0)
         _tie_to_block(axc, S.INNOV["B"], "B  db4 sub-bands of $y$")
-        S.panel_tag(axc, "c", size=6.5, loc="lower right")
+        S.panel_tag(axc, "b", size=6.5, loc="lower right")
 
-        # ---------- (d) covariates ----------
+        # ---------- (c) covariates ----------
         axd = fig.add_subplot(gs[0, 2])
         greens = ["#1B7837", "#5AAE61", "#7FBC9B", "#A6DBA0"]
         _stack(axd, t, [(c, Z[w0:w1, FEAT.index(c)], greens[j], 0.55)
                         for j, c in enumerate(COV)][::-1], gap=1.0)
         _tie_to_block(axd, S.INNOV["C_exo"], "C$_2$  Standardised covariates")
-        S.panel_tag(axd, "d", size=6.5, loc="lower right")
+        S.panel_tag(axd, "c", size=6.5, loc="lower right")
 
         fig.text(0.500, 0.012,
                  "traces rescaled to equal height and offset for display; "

@@ -124,16 +124,39 @@ def build(out_dir: str = "manuscript/figures/results",
         # and iTransformer is uniformly worse so it adds no comparison here
         show = [D.PROPOSED, REF, "lstm"]
         ends = {}
+        # The h=12 solid and h=24 dashed curves of a given model are NOT
+        # equally distinguishable, and that misleads the eye (2026-08 fix).
+        # Measured overlap over the first 12 steps: DLinear 0.14 kW mean
+        # difference (max 0.37), LSTM 4.80, TRDFormer 18.86. So DLinear's
+        # solid h=12 line is *completely* hidden under its own h=24 dashed
+        # line, which reads as "the blue curve alone runs to 4 h while the
+        # red one stops at 2 h" -- i.e. as a truncation bug rather than as
+        # two overlapping series. Two cheap disambiguators, no data change:
+        #   * dashed h=24 gets thinner and more transparent than solid h=12,
+        #     so where they coincide the solid line still shows through;
+        #   * every solid h=12 curve gets a filled marker at its final step,
+        #     which is the point the text quotes and the only place the two
+        #     horizons must not be confused.
         for h, ls in ((12, "-"), (24, (0, (2.6, 1.4)))):
+            dashed = h == 24
             for m in show:
                 mu, _ = D.per_step_mae(m, h)
                 if mu is None:
                     continue
                 t = np.arange(1, len(mu) + 1) * 10 / 60.0
+                base_lw = 1.35 if m == D.PROPOSED else 0.85
                 axp.plot(t, mu, ls=ls, color=D.MODEL_COLOR[m],
-                         lw=1.35 if m == D.PROPOSED else 0.85,
-                         alpha=1.0 if m == D.PROPOSED else 0.8,
-                         zorder=4 if m == D.PROPOSED else 3)
+                         lw=base_lw * (0.72 if dashed else 1.0),
+                         alpha=(0.55 if dashed else 1.0) if m == D.PROPOSED
+                         else (0.45 if dashed else 0.9),
+                         zorder=(3 if dashed else 5) if m == D.PROPOSED
+                         else (2 if dashed else 4))
+                if not dashed:
+                    axp.plot(t[-1], mu[-1], marker="o",
+                             ms=2.9 if m == D.PROPOSED else 2.2,
+                             color=D.MODEL_COLOR[m], mec="white",
+                             mew=0.45,
+                             zorder=6 if m == D.PROPOSED else 5)
                 if m == D.PROPOSED:
                     ends[h] = (t[-1], mu[-1])
         axp.set_xlabel("Lead time within horizon (h)", labelpad=1.5)
@@ -154,7 +177,14 @@ def build(out_dir: str = "manuscript/figures/results",
         h_model = [plt.Line2D([], [], color=D.MODEL_COLOR[m],
                               lw=1.3 if m == D.PROPOSED else 0.9,
                               label=D.PRETTY[m]) for m in show]
-        h_model.append(plt.Line2D([], [], color="#777777", lw=0.8,
+        # Spell out the solid/dashed contract explicitly. "dashed: h=24"
+        # alone left the solid case implicit, which is exactly the pairing a
+        # reader gets wrong where the two coincide.
+        h_model.append(plt.Line2D([], [], color="#777777", lw=0.9, ls="-",
+                                  marker="o", ms=2.2, mec="white", mew=0.45,
+                                  label="solid: $h$=12"))
+        h_model.append(plt.Line2D([], [], color="#777777", lw=0.65,
+                                  alpha=0.5,
                                   ls=(0, (2.6, 1.4)), label="dashed: $h$=24"))
         axp.legend(handles=h_model, loc="lower right", fontsize=5.8,
                    labelspacing=0.20, borderpad=0.28, handlelength=1.5,
@@ -164,8 +194,17 @@ def build(out_dir: str = "manuscript/figures/results",
         # the shape of the whole curve rather than one point, so there is no
         # sensible anchor, and any arc from a free corner to the first step
         # had to cross every curve in the panel to get there.
+        #
+        # The horizon qualifier is not decoration (2026-08 fix). Unqualified,
+        # the sentence read as a claim about the whole panel, but the panel
+        # draws both horizons and "leads ... marginally" only holds at h=12
+        # (31.00 vs 33.48 kW, a 2.47 kW gap). At h=24 DLinear leads the first
+        # step by 13.24 kW (30.97 vs 44.21) and wins on the horizon average
+        # too (100.21 vs 104.67), so an unqualified sentence overstated the
+        # h=12 reading and understated the h=24 one. The body text always
+        # carried "at h=12"; the box did not.
         axp.text(0.035, 0.945,
-                 "DLinear leads at the first step,\nthen degrades faster",
+                 "$h$=12: DLinear leads at step 1,\nthen degrades faster",
                  transform=axp.transAxes, ha="left", va="top", fontsize=5.7,
                  color="#1F4E79", zorder=1500,
                  bbox=dict(boxstyle="round,pad=0.28", facecolor="#EEF5FC",

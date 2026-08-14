@@ -7,7 +7,7 @@ Code and result records for:
 
 > **Look-ahead leakage in decomposition-based wind power forecasting:
 > quantification and causal alternatives**
-> Shengzhe Kang, Xiping Zhu, Tao Yang
+> Xiping Zhu, Shengzhe Kang, Tao Yang
 > School of Electrical and Information Engineering, Southwest Petroleum University
 > *Under review, Electric Power Systems Research.*
 
@@ -247,7 +247,7 @@ diagram and in every data figure.
 @article{kang2026leakage,
   title   = {Look-ahead leakage in decomposition-based wind power forecasting:
              quantification and causal alternatives},
-  author  = {Kang, Shengzhe and Zhu, Xiping and Yang, Tao},
+  author  = {Zhu, Xiping and Kang, Shengzhe and Yang, Tao},
   journal = {Electric Power Systems Research},
   note    = {Under review},
   year    = {2026}
@@ -256,7 +256,7 @@ diagram and in every data figure.
 @misc{trdformer_code,
   title     = {Code and aggregate result records for ``Look-ahead leakage in
                decomposition-based wind power forecasting''},
-  author    = {Kang, Shengzhe and Zhu, Xiping and Yang, Tao},
+  author    = {Zhu, Xiping and Kang, Shengzhe and Yang, Tao},
   year      = {2026},
   publisher = {Zenodo},
   doi       = {10.5281/zenodo.21911236}
