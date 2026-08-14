@@ -1,85 +1,102 @@
-# TRDFormer
+# Look-ahead leakage in decomposition-based wind power forecasting
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21911236.svg)](https://doi.org/10.5281/zenodo.21911236)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Code and result records for:
 
-> **TRDFormer: Trend-residual decomposition with wavelet sub-band attention for
-> short-term wind power forecasting**
+> **Look-ahead leakage in decomposition-based wind power forecasting:
+> quantification and causal alternatives**
 > Shengzhe Kang, Xiping Zhu, Tao Yang
 > School of Electrical and Information Engineering, Southwest Petroleum University
 > *Under review, Electric Power Systems Research.*
 
+## What this repository shows
+
+Decomposition-based hybrids dominate recent wind power forecasting: 44 of 50
+papers we surveyed feed sub-bands from a signal decomposition (VMD, EMD,
+wavelet, ...) into a deep network. Those decompositions are almost always
+computed **offline over a whole data segment**, which makes the sub-band value
+at time `t` a function of samples *after* `t` — even when the decomposition is
+fitted independently within each train/validation/test partition, which is
+the safeguard the field already applies against a different, cruder form of
+leakage.
+
+We built a complete trend-residual / wavelet hybrid (`TRDFormer` below) the way
+this literature builds such models, then measured how much of its reported
+accuracy comes from that look-ahead rather than from the architecture. Three
+independent diagnostics agree: **essentially all of it.**
+
+| Diagnostic | Offline decomposition | Strictly causal |
+|---|---|---|
+| Ridge probe, gain over persistence at lead 1 | −16.61 kW | −1.50 kW |
+| Full model MAE, $h=12$ (10 seeds) | 58.18 ± 1.13 kW | 91.10 ± 4.37 kW |
+| vs. training with no sub-bands at all (81.95 kW) | **−29.0 %** | **+11.2 %** |
+| Ridge regression given the same sub-bands | 58.06 kW | — |
+
+Reading the last row: a plain ridge regression handed the leaked sub-bands
+matches the full deep model (58.06 vs. 58.18 kW). The architecture adds nothing
+measurable once the leakage is available — though it is worth a genuine 24 kW
+when the sub-bands are removed and it has to work with causally admissible
+inputs only.
+
+Delaying the offline sub-bands by 12 steps — changing nothing about the
+decomposition itself, only how stale the features are — reproduces the
+no-sub-band baseline to within 0.01 kW. That is the cleanest single number in
+the repository: it isolates alignment from architecture and shows the entire
+ablation effect is alignment.
+
+## The model used as the case study
+
 The forecaster splits the task in two. A linear branch takes the strongly
 auto-correlated trend — the component a single linear layer already predicts
 almost perfectly, and the reason plain deep models often fail to beat DLinear
-on wind power. A deep branch then models only the residual, which is handed to
-it already separated into five db4 wavelet sub-bands, each entering a
-variate-attention encoder as its own token. Meteorological covariates are
-encoded separately by an LSTM, and a learned per-sample gate decides how much
-of each branch to use.
+on wind power. A deep branch models the residual, handed to it pre-separated
+into five db4 wavelet sub-bands, each entering a variate-attention encoder as
+its own token. Meteorological covariates are encoded separately by an LSTM,
+and a learned per-sample gate decides how much of each branch to use.
 
-## Headline results
+This is *not* proposed as a state-of-the-art forecaster. It is the vehicle used
+to measure the leakage, assembled from components standard in this literature
+specifically so that the measurement is a property of common practice.
 
-SDWPF, turbine 1, 10-minute resolution, 10 seeds per cell. Horizons are
-$h = 1, 6, 12, 24$ steps, i.e. 10 min to 4 h ahead.
+## Causal alternative and diagnostic tools released here
 
-| | TRDFormer | DLinear (strongest baseline) | |
-|---|---|---|---|
-| MAE, $h=1$ | **26.18 ± 1.20** kW | 30.93 ± 0.03 kW | −15.3 % |
-| MAE, $h=12$ | **58.18 ± 1.13** kW | 70.37 ± 0.11 kW | −17.3 % |
-| MAE, $h=24$ | 104.67 ± 10.61 kW | **100.21 ± 0.30** kW | +4.4 % |
-| MAE, top decile of power ramps ($h=12$) | **157.04 ± 5.03** kW | 278.14 ± 0.06 kW | **−43.5 %** |
+- `scripts/gen_dwt_imfs_atrous.py` — a strictly causal, exactly additive
+  undecimated filter bank (additivity `9e-16`, zero measured look-ahead by
+  construction). Use this where a multi-scale decomposition is genuinely
+  wanted and causality matters.
+- `scripts/gen_dwt_imfs_causal.py`, `gen_dwt_imfs_variants.py`,
+  `gen_dwt_imfs_lagged.py` — trailing-window and delayed-band variants used to
+  separate "removing the sub-bands" from "removing the look-ahead".
+- `tools/probe_subband_leakage.py` — the ridge probe: how much does a
+  sub-band vector at `t` reveal about `y(t+h)`, beyond what `y(t)` already
+  gives every model?
+- `tools/probe_linear_ceiling.py` — the linear-ceiling check: does a plain
+  ridge regression on the same inputs match the deep model? If yes, the
+  architecture is not what the ablation is measuring.
+- `tools/probe_perturbation.py` — inject a known perturbation after the
+  forecast origin and confirm the decomposition should not, but does, move.
+- `tests/test_dwt_causality.py` — asserts both the partition-isolation
+  guarantee and the sample-wise non-causality within a partition.
 
-Ablation at $h=12$, quoted as the MAE increase when a component is removed:
-
-| Component removed | MAE inflation |
-|---|---|
-| Partition-isolated DWT sub-bands | **+40.8 %** |
-| Trend–residual decomposition | +31.0 % |
-| Endogenous (iTransformer) branch | +28.3 % |
-| Adaptive gate → fixed cross-attention | +9.4 % |
-| Exogenous (LSTM) branch | +1.9 % |
-
-Three results the paper reports because they are unfavourable, and which this
-repository lets you check:
-
-- **DLinear wins at $h=24$** under the canonical split. The $h=24$ ranking is
-  split-dependent, not a stable property of the horizon.
-- **The KAN head earns nothing.** It is within seed noise of a linear head
-  despite 9.9× the parameters, and a two-layer MLP head is both smaller and
-  more accurate. It is retained and reported, not quietly swapped out.
-- **The DWT is not sample-wise causal.** Sub-bands are fitted independently
-  *within* each partition, so no test value is informed by another partition —
-  that is the leakage guarantee that matters for a fair comparison. But inside
-  a partition `pywt.wavedec`/`waverec` reconstructs from the whole partition at
-  once; a perturbation test shifts the reconstruction at a reference index by
-  up to 2.3 standardised units. This suits the offline evaluation performed
-  here, not a strictly online deployment.
+We recommend running the linear-ceiling check alongside any ablation of a
+decomposition-based model: it costs one ridge fit and bounds what the
+architecture can possibly be contributing.
 
 ## What is and is not in this repository
 
 Tracked: all model and pipeline code, all experiment configurations, and the
 **aggregate run records** (`run_records.jsonl`, per-epoch losses, fusion-gate
-weights, scalers, partition manifests) for all 1,048 training runs.
+weights, scalers, partition manifests) for all 1,108 training runs.
 
 Not tracked, and why:
 
 | Excluded | Size | Why / how to get it |
 |---|---|---|
 | `data/` | 17 MB | SDWPF is public but redistribution terms are the publisher's. See below. |
-| `outputs/**/*_preds.npz` | 511 MB | 917 per-sample prediction arrays. Regenerable by re-running, or available on request. |
+| `outputs/**/*_preds.npz` | 511 MB | Per-sample prediction arrays. Regenerable by re-running, or available on request. |
 | `manuscript/` | — | The article is under review; this is a code and results deposit. |
-
-Consequently, from a fresh clone:
-
-| Target | Reproducible as cloned? |
-|---|---|
-| Tables 1–3, Appendix Tables A.1–A.2 | **yes** |
-| Fig. 4 (baseline comparison), Fig. 6 (ablation + gate), Fig. 8 (generalisation) | **yes** |
-| Fig. 1, Fig. 3, graphical abstract | after downloading SDWPF (below) |
-| Fig. 5 (prediction matrix), Fig. 7 (ramp cases), Fig. A.1 | needs the prediction arrays |
 
 ## Install
 
@@ -111,7 +128,8 @@ the DWT **within each partition**, and writes the manifests:
 python -m scripts.preprocess_cli --csv-path data/wind/<raw>.csv \
                                  --lookback 144 --horizon 12
 python -m scripts.gen_partition_manifests        # remaining horizons
-python -m scripts.gen_dwt_imfs                   # db4 sub-bands
+python -m scripts.gen_dwt_imfs                   # offline db4 sub-bands
+python -m scripts.gen_dwt_imfs_atrous             # causal alternative
 ```
 
 Turbine 1 yields 35,279 valid samples. Pass `--help` to each for the full flag
@@ -119,34 +137,41 @@ list.
 
 ## Reproduce
 
+### The leakage diagnostics — no GPU, no training
+
+```bash
+python tools/probe_subband_leakage.py
+python tools/probe_linear_ceiling.py
+python tools/probe_perturbation.py
+```
+
 ### Figures and tables — no GPU, no training
 
 ```bash
-python -m visualization.build_all_figures        # 7 in-article figures + graphical abstract
+python -m visualization.build_all_figures
 python tools/wordcount_epsr.py --sections --floats
+python tools/verify_manuscript_numbers.py   # cross-checks every reported
+                                             # number against run_records.jsonl
 ```
-
-Each figure script also writes a downscaled copy under `_preview/`; the print
-assets are 640 dpi and exceed 3000 px on the long edge.
 
 ### Retrain
 
 ```bash
 python -m scripts.run_batch     --horizons 1 6 12 24 --seeds 42 43 44 45 46 47 48 49 50 51
 python -m scripts.run_batch_v2  --horizons 1 6 12 24 --seeds 42 43 44 45 46 47 48 49 50 51
+python -m scripts.run_batch_v2  --horizons 12 --seeds 42 43 44 45 46 47 48 49 50 51 \
+    --imf-path outputs/manifests/dwt_imfs_atrous.npz --out-dir outputs/causal_h12
 python -m scripts.run_multiturb_v2 --horizons 1 6 12 24 --turbines 1 2 13 55 70 83 86 88 94 99
-python -m scripts.benchmark_compute_cost --out outputs/analysis/compute_cost.json
 ```
 
-`run_batch` covers the 11 baselines, `run_batch_v2` the proposed model and its
-ablation variants. Both shard across GPUs via `--num-shards/--shard-index`; the
-wrappers under `scripts/*.sh` show how the reported runs were launched. The
-expanding-window study reuses `run_batch_v2` against alternative partition
-manifests (`partition_W1/W2/W3.json`, run ids `proposed_v2_W{1,2,3}_seed*`).
+`run_batch` covers the 11 baselines, `run_batch_v2` the case-study model, its
+ablation variants, and — via `--imf-path` — every causalisation variant
+reported in the paper. Both shard across GPUs via `--num-shards/--shard-index`.
 
-The run budget behind the paper is 480 + 70 + 480 + 18 = **1,048** runs:
+The run budget behind the paper is 480 + 70 + 60 + 480 + 18 = **1,108** runs:
 480 for the 12-model × 4-horizon × 10-seed main comparison, 70 for the
-7-variant ablation, 480 for the 10-turbine generalisation study
+7-variant ablation, 60 for the six causalisation variants (10 seeds each,
+$h=12$), 480 for the 10-turbine generalisation study
 (10 × 4 models × 4 horizons × 3 seeds), and 18 for the expanding-window
 temporal robustness check.
 
@@ -155,17 +180,19 @@ temporal robustness check.
 ```
 data_pipeline/    cleaning, partition-isolated scaling and DWT, windowing
 layers/           DWT decomposition, adaptive gate, KAN, RevIN, attention
-models/           TRDFormer and the 11 baselines
+models/           the case-study model (TRDFormer) and the 11 baselines
 experiments/      library: run matrix, runner, metrics, significance tests
-scripts/          CLI entry points (preprocessing, batch training, benchmarks)
+scripts/          CLI entry points: preprocessing, batch training, benchmarks,
+                  causal / delayed / trailing-window sub-band generators
+tools/            leakage probes, word-count / float-placement auditing,
+                  manuscript-number verification
 visualization/    _style.py (one design system) + one script per figure
-tools/            word-count / float-placement auditing
 outputs/          run records, configs, gate weights, manifests
-tests/            151 unit tests: cleaning rules, metrics against known
-                  values, model/ablation forward shapes, run-matrix
-                  bookkeeping, and test_dwt_causality.py, which asserts both
-                  the partition-isolation guarantee and the sample-wise
-                  non-causality the paper reports
+tests/            unit tests: cleaning rules, metrics against known values,
+                  model/ablation forward shapes, run-matrix bookkeeping, and
+                  test_dwt_causality.py, which asserts both the
+                  partition-isolation guarantee and the sample-wise
+                  non-causality within a partition that this paper measures
 ```
 
 `visualization/_style.py` is the single source of truth for figure geometry,
@@ -175,9 +202,9 @@ diagram and in every data figure.
 ## Citation
 
 ```bibtex
-@article{kang2026trdformer,
-  title   = {{TRDFormer}: Trend-residual decomposition with wavelet sub-band
-             attention for short-term wind power forecasting},
+@article{kang2026leakage,
+  title   = {Look-ahead leakage in decomposition-based wind power forecasting:
+             quantification and causal alternatives},
   author  = {Kang, Shengzhe and Zhu, Xiping and Yang, Tao},
   journal = {Electric Power Systems Research},
   note    = {Under review},
@@ -185,7 +212,8 @@ diagram and in every data figure.
 }
 
 @misc{trdformer_code,
-  title     = {{TRDFormer}: code and aggregate result records},
+  title     = {Code and aggregate result records for ``Look-ahead leakage in
+               decomposition-based wind power forecasting''},
   author    = {Kang, Shengzhe and Zhu, Xiping and Yang, Tao},
   year      = {2026},
   publisher = {Zenodo},

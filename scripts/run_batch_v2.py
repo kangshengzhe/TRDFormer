@@ -92,8 +92,27 @@ def _build_v2_model(cfg: RunConfig) -> torch.nn.Module:
     )
 
 
-def _dataset_cfg(horizon: int) -> dict:
-    """Dataset config for V2 (always uses DWT/VMD)."""
+DEFAULT_IMF_PATH = "outputs/manifests/vmd_imfs.npz"
+
+
+def _dataset_cfg(horizon: int, imf_path: str = DEFAULT_IMF_PATH,
+                 allow_non_additive: bool = False) -> dict:
+    """Dataset config for V2 (always uses DWT/VMD).
+
+    ``imf_path`` is a parameter rather than a constant so that an alternative
+    sub-band file can be swapped in without touching the shared
+    outputs/manifests/vmd_imfs.npz. That matters for the strictly-causal DWT
+    ablation (scripts/gen_dwt_imfs_causal.py): overwriting the shared file
+    would silently change every later run, including reruns of the numbers
+    already reported in the paper.
+
+    ``allow_non_additive`` disables the runner's guard that sub-bands must sum
+    to the standardised target. Keep it False for anything reported as the
+    proposed model -- the guard is what catches VMD modes silently occupying
+    the DWT slot. It is needed only for the lagged-band causality test
+    (scripts/gen_dwt_imfs_lagged.py), where sum(bands[t]) equals y(t-k) by
+    design rather than y(t).
+    """
     return {
         "csv_path": "data/wind/sdwpf_turb1_cleaned_final.csv",
         "features": ["Patv", "Wspd", "Wdir", "Etmp", "Itmp"],
@@ -102,7 +121,8 @@ def _dataset_cfg(horizon: int) -> dict:
         "vmd": {
             "enabled": True, "K": 5,
             "params_path": "outputs/manifests/vmd_params.json",
-            "imf_path": "outputs/manifests/vmd_imfs.npz",
+            "imf_path": imf_path,
+            "allow_non_additive": allow_non_additive,
         },
         "cleaning": {"physical_rules": True},
     }
@@ -112,7 +132,9 @@ def _make_run_id(horizon: int, seed: int) -> str:
     return f"proposed_v2_h{horizon}_seed{seed}"
 
 
-def _build_config(horizon, seed, epochs, device, out_dir) -> RunConfig:
+def _build_config(horizon, seed, epochs, device, out_dir,
+                  imf_path: str = DEFAULT_IMF_PATH,
+                  allow_non_additive: bool = False) -> RunConfig:
     return RunConfig(
         run_id=_make_run_id(horizon, seed),
         model_name="proposed_v2",
@@ -143,7 +165,7 @@ def _build_config(horizon, seed, epochs, device, out_dir) -> RunConfig:
             "deterministic": True,
             "out_dir": out_dir,
         },
-        dataset=_dataset_cfg(horizon),
+        dataset=_dataset_cfg(horizon, imf_path, allow_non_additive),
     )
 
 
@@ -328,6 +350,17 @@ def main(argv=None) -> int:
                         default=[42, 43, 44, 45, 46, 47, 48, 49, 50, 51])
     parser.add_argument("--epochs", type=int, default=150)
     parser.add_argument("--out-dir", default=".")
+    parser.add_argument("--imf-path", default=DEFAULT_IMF_PATH,
+                        help="sub-band file to feed the deep branch. Point this "
+                             "at outputs/manifests/dwt_imfs_causal.npz to run "
+                             "the strictly-causal DWT ablation without "
+                             "overwriting the shared vmd_imfs.npz.")
+    parser.add_argument("--allow-non-additive", action="store_true",
+                        help="skip the guard requiring sub-bands to sum to the "
+                             "standardised target. Required only for the "
+                             "lagged-band causality test, where the sum equals "
+                             "y(t-k) by construction. Never use this for runs "
+                             "reported as the proposed model.")
     parser.add_argument("--num-shards", type=int, default=1)
     parser.add_argument("--shard-index", type=int, default=0)
     args = parser.parse_args(argv)
@@ -388,7 +421,8 @@ def main(argv=None) -> int:
             print("\r" + msg + " " * 4, end="", flush=True)
 
         try:
-            cfg = _build_config(horizon, seed, args.epochs, device, out_dir)
+            cfg = _build_config(horizon, seed, args.epochs, device, out_dir,
+                            args.imf_path, args.allow_non_additive)
             rec = _run_single(cfg, progress_cb=_cb)
             m = rec.metrics
             dt = time.perf_counter() - t_run
