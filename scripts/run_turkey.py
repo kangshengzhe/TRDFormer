@@ -76,7 +76,12 @@ from experiments.runner import (
 )
 
 MAN = Path("outputs/manifests")
-OUT_JSONL = Path("outputs/runs/turkey_records.jsonl")
+RUNS = Path("outputs/runs")
+# Each shard writes its OWN file and the summary globs them back together.
+# Two processes appending to one file would usually be safe on Linux (a record
+# is ~400 B, well under the atomic-append limit), but it is not guaranteed on
+# every platform and a torn line would corrupt the whole record set.
+JSONL_GLOB = "turkey_records*.jsonl"
 
 # [Patv, (5 bands), Wspd, Wdir] -- this turbine has no temperature channels
 VARIANTS = {
@@ -147,7 +152,7 @@ def make_cfg(variant: str, seed: int, horizon: int, epochs: int,
 
 
 def run_one(variant: str, seed: int, horizon: int, epochs: int,
-            patience: int, device_str: str) -> dict:
+            patience: int, device_str: str, out_jsonl: Path) -> dict:
     cfg = make_cfg(variant, seed, horizon, epochs, patience, device_str)
     device = _resolve_device(cfg.runtime)
     set_seed(seed)
@@ -220,8 +225,8 @@ def run_one(variant: str, seed: int, horizon: int, epochs: int,
         "seconds": round(time.time() - t0, 1),
         "device": str(device),
     }
-    OUT_JSONL.parent.mkdir(parents=True, exist_ok=True)
-    with open(OUT_JSONL, "a", encoding="utf-8") as fh:
+    out_jsonl.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_jsonl, "a", encoding="utf-8") as fh:
         fh.write(json.dumps(rec) + "\n")
     print(f"  {variant:8s} seed {seed}  MAE {mae_kw:8.2f} kW  "
           f"({ep} epochs, {rec['seconds']}s)")
@@ -237,18 +242,41 @@ def main() -> None:
     ap.add_argument("--epochs", type=int, default=150)
     ap.add_argument("--patience", type=int, default=10)
     ap.add_argument("--device", default="auto")
+    ap.add_argument("--num-shards", type=int, default=1,
+                    help="split the (variant, seed) task list across N processes")
+    ap.add_argument("--shard-index", type=int, default=0,
+                    help="which shard this process runs (0-based)")
+    ap.add_argument("--summary-only", action="store_true",
+                    help="print the merged summary and exit, running nothing")
     a = ap.parse_args()
 
     if not (MAN / "turkey_data.npz").exists():
         raise SystemExit("run scripts/prep_turkey.py first")
+    if not (0 <= a.shard_index < a.num_shards):
+        raise SystemExit(
+            f"--shard-index must be in [0, {a.num_shards - 1}]")
 
-    print("=" * 66)
-    print(f"Turkey retraining: {len(a.variants)} variants x {len(a.seeds)} seeds "
-          f"= {len(a.variants) * len(a.seeds)} runs, h={a.horizon}")
-    print("=" * 66)
-    for v in a.variants:
-        for s in a.seeds:
-            run_one(v, s, a.horizon, a.epochs, a.patience, a.device)
+    # Round-robin over the flat task list rather than splitting the seed list.
+    # no_dwt has 3 input channels against 8 for the other two and so trains
+    # faster; interleaving keeps the fast and slow tasks spread evenly across
+    # shards instead of loading one GPU with all the cheap ones.
+    tasks = [(v, s) for v in a.variants for s in a.seeds]
+    mine = tasks[a.shard_index::a.num_shards]
+
+    suffix = f"_s{a.shard_index}" if a.num_shards > 1 else ""
+    out_jsonl = RUNS / f"turkey_records{suffix}.jsonl"
+
+    if not a.summary_only:
+        print("=" * 66)
+        print(f"Turkey retraining, h={a.horizon}")
+        if a.num_shards > 1:
+            print(f"shard {a.shard_index + 1}/{a.num_shards}: "
+                  f"{len(mine)} of {len(tasks)} runs -> {out_jsonl.name}")
+        else:
+            print(f"{len(tasks)} runs -> {out_jsonl.name}")
+        print("=" * 66)
+        for v, s in mine:
+            run_one(v, s, a.horizon, a.epochs, a.patience, a.device, out_jsonl)
 
     # ---- summary -------------------------------------------------------
     # Records are APPENDED, so a re-run (or an interrupted run resumed) leaves
@@ -257,17 +285,26 @@ def main() -> None:
     # toward zero, because the duplicates carry no extra variance. Keep only
     # the LAST record for each key, which is also what "re-run to overwrite"
     # should mean.
+    files = sorted(RUNS.glob(JSONL_GLOB))
+    if not files:
+        raise SystemExit(f"no records found under {RUNS}/{JSONL_GLOB}")
     seen: dict[tuple, dict] = {}
     dupes = 0
-    for line in open(OUT_JSONL, encoding="utf-8"):
-        r = json.loads(line)
-        key = (r["variant"], r["seed"], r["horizon"])
-        if key in seen:
-            dupes += 1
-        seen[key] = r
+    for f in files:
+        for line in open(f, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            r = json.loads(line)
+            key = (r["variant"], r["seed"], r["horizon"])
+            if key in seen:
+                dupes += 1
+            seen[key] = r
+    print(f"\nmerged {len(files)} record file(s): "
+          f"{', '.join(f.name for f in files)}")
     if dupes:
-        print(f"\n(note: {dupes} duplicate record(s) collapsed; "
-              f"keeping the most recent per variant/seed/horizon)")
+        print(f"({dupes} duplicate record(s) collapsed; keeping the most "
+              f"recent per variant/seed/horizon)")
     recs = [r for r in seen.values() if r["horizon"] == a.horizon]
     print()
     print("=" * 66)
