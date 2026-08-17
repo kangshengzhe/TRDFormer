@@ -46,6 +46,28 @@ no-sub-band baseline to within 0.01 kW. That is the cleanest single number in
 the repository: it isolates alignment from architecture and shows the entire
 ablation effect is alignment.
 
+### It is not a quirk of the wavelet either
+
+Most of the 44 surveyed papers use VMD rather than a wavelet, so the probe was
+repeated on a K=5 VMD of the same series (per partition, fixed parameters):
+
+| Probe gain over persistence | lead 1 | lead 12 |
+|---|---|---|
+| Offline DWT | −16.61 kW | −32.39 kW |
+| Offline VMD | −7.34 kW | **−68.33 kW** |
+| VMD delayed 12 steps | **+55.93 kW** | −20.41 kW |
+
+Both leak, with different profiles: the wavelet's finest detail band reveals
+most about the *next* step, while VMD's narrow-band modes reveal the window's
+*direction* and so dominate at long lead. Delaying the VMD modes by 12 steps
+does not merely remove the gain, it **reverses** it — 12-step-old modes are
+worse than persistence, which is what you expect from a feature whose value
+came from time alignment rather than frequency content.
+
+Note VMD is not exactly additive the way a DWT is: on the test partition
+`|sum(modes) − y|` has mean 0.051 and max 1.004 standardised units, against
+~1e-7 for the wavelet.
+
 ### It is not a quirk of one dataset
 
 The two model-free diagnostics replicate on an independent single-turbine SCADA
@@ -106,6 +128,10 @@ specifically so that the measurement is a property of common practice.
 - `tools/cross_dataset_leakage_check.py` — both probes on a second,
   independent SCADA record, decomposing strictly inside contiguous segments
   so no filter crosses a sampling gap.
+- `tools/probe_vmd_leakage.py` — the same probe on a K=5 VMD instead of the
+  wavelet, since VMD is the commonest choice in the surveyed literature. It
+  self-checks by first reproducing the paper's offline-DWT figure under the
+  identical protocol, and aborts if it cannot.
 - `tests/test_dwt_causality.py` — asserts both the partition-isolation
   guarantee and the sample-wise non-causality within a partition.
 
